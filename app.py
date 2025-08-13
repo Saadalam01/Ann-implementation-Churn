@@ -39,7 +39,7 @@ is_active_member=st.selectbox("IsActiveMember",[0,1])
 #Preparing the input data
 input_data=pd.DataFrame({
 "Geography": [geography],
-"Credit Score":[credit_score],
+"CreditScore":[credit_score],
 "Gender":[le_encoder_gender.transform([gender])[0]],
 "Age" : [age],
 "Tenure":[tenure],
@@ -53,14 +53,16 @@ input_data=pd.DataFrame({
 #onehot encoded geography
 geo_encoder=OneHotEncoder()
 geo_encoded=geo_encoder.fit_transform(input_data[["Geography"]])
-# geo_columns=geo_encoder.get_feature_names_out("Geography")
-geo_columns = geo_encoder.get_feature_names_out("Geography")
+geo_columns = geo_encoder.get_feature_names_out(["Geography"])
 geo_encoded_df=pd.DataFrame(geo_encoded.toarray(),columns=geo_columns)
 
 #combine one hot encoded columns with input data
 input_data=pd.concat([input_data.reset_index(drop=True),geo_encoded_df],axis=1)
 
 #Scale the input data
+if "Geography" in input_data.columns:
+    input_data = input_data.drop(columns=["Geography"])
+input_data = input_data[scaler.feature_names_in_]
 input_data_scaled=scaler.transform(input_data)
 
 #prediction churn
